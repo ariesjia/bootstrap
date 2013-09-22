@@ -190,6 +190,13 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.position'])
           } else if ( updateSelected ) {
             selected = date;
           }
+        }else{
+            if( datepickerCtrl.minDate && datepickerCtrl.minDate > selected ){
+                selected = datepickerCtrl.minDate;
+            }
+            if( datepickerCtrl.maxDate && datepickerCtrl.maxDate < selected ){
+                selected = datepickerCtrl.maxDate;
+            }
         }
         ngModel.$setValidity('date', valid);
 

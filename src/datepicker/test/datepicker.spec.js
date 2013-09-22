@@ -1144,6 +1144,47 @@ describe('datepicker directive', function () {
         expect(inputEl.val()).toBe('pizza');
       });
     });
+
+    describe('max min logic', function() {
+      var monthNames = [ "January", "February", "March", "April", "May", "June",
+              "July", "August", "September", "October", "November", "December" ],
+          now = new Date(),
+          lastYear = now.getFullYear() - 1,
+          nextYear = now.getFullYear() + 1;
+
+      beforeEach(inject(function() {
+        $rootScope.maxdate = null;
+        $rootScope.mindate = null;
+        $rootScope.date = null;
+        element = $compile('<datepicker ng-model="$parent.date" max="maxdate" min="mindate" ></datepicker>')($rootScope);
+        $rootScope.$digest();
+      }));
+
+      it('should be show today to default', function() {
+        expect(getTitle()).toEqual(monthNames[now.getMonth()] + " " + now.getFullYear());
+      });
+
+      it('should be show today to default', function() {
+        $rootScope.mindate = new Date(lastYear, 8, 1);
+        $rootScope.maxdate = new Date(nextYear, 8, 1);
+        $rootScope.$digest();
+        expect(getTitle()).toEqual(monthNames[now.getMonth()] + " " + now.getFullYear());
+      });
+
+      it('initial date is min when min after current date', function() {
+        $rootScope.mindate = new Date(nextYear, 8, 1);
+        $rootScope.$digest();
+        expect(getTitle()).toEqual('September ' + nextYear );
+      });
+
+      it('initial date is max when max before current date', function() {
+        $rootScope.maxdate = new Date(lastYear, 8, 1);
+        $rootScope.$digest();
+        expect(getTitle()).toEqual('September ' + lastYear);
+      });
+
+    });
+
   });
 });
 
