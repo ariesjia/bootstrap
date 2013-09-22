@@ -335,6 +335,10 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
         'ng-model': 'date',
         'ng-change': 'dateSelection()'
       });
+
+      if (angular.isDefined(attrs.buttonGroupTemplateUrl)) {
+          popupEl.attr('button-group-template-url', attrs.buttonGroupTemplateUrl);
+      }
       var datepickerEl = popupEl.find('datepicker');
       if (attrs.datepickerOptions) {
         datepickerEl.attr(angular.extend({}, originalScope.$eval(attrs.datepickerOptions)));
@@ -446,6 +450,9 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
       scope.today = function() {
         $setModelValue(originalScope, new Date());
       };
+      scope.selectDate = function(date) {
+        $setModelValue(originalScope,  date ? new Date(date) : new Date());
+      };
       scope.clear = function() {
         $setModelValue(originalScope, null);
       };
@@ -455,7 +462,7 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
   };
 }])
 
-.directive('datepickerPopupWrap', function() {
+.directive('datepickerPopupWrap',["$compile", function($compile) {
   return {
     restrict:'E',
     replace: true,
@@ -466,6 +473,24 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
         event.preventDefault();
         event.stopPropagation();
       });
+      var popupEl = angular.element('<datepicker-popup-button-group></datepicker-popup-button-group>');
+      if (angular.isDefined(attrs.buttonGroupTemplateUrl)) {
+        popupEl.attr('button-group-template-url', attrs.buttonGroupTemplateUrl);
+      }
+      element.find("li").eq(2).prepend($compile(popupEl)(scope));
     }
   };
-});
+}])
+
+.directive('datepickerPopupButtonGroup',["$parse", "$templateCache", "$http", "$compile",
+        function($parse, $templateCache, $http, $compile) {
+  return {
+    restrict:'AE',
+    link:function (scope, element, attrs) {
+        var tplUrl = attrs.buttonGroupTemplateUrl || 'template/datepicker/popup-button-group.html';
+        $http.get(tplUrl, {cache: $templateCache}).success(function(tplContent){
+            element.replaceWith($compile(tplContent.trim())(scope));
+        });
+    }
+  };
+}]);

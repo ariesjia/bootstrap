@@ -3,6 +3,7 @@ describe('datepicker directive', function () {
   beforeEach(module('ui.bootstrap.datepicker'));
   beforeEach(module('template/datepicker/datepicker.html'));
   beforeEach(module('template/datepicker/popup.html'));
+  beforeEach(module('template/datepicker/popup-button-group.html'));
   beforeEach(inject(function(_$compile_, _$rootScope_) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
@@ -1236,6 +1237,8 @@ describe('datepicker directive', function () {
 
     });
 
+
+
   });
 });
 
@@ -1259,4 +1262,28 @@ describe('datepicker directive with empty initial state', function () {
   it('is shows rows with days', function() {
     expect(element.find('tbody').find('tr').length).toBeGreaterThan(3);
   });
+});
+
+describe('',function(){
+    var $rootScope, element, $httpBackend;
+
+    beforeEach(module('ui.bootstrap.datepicker'));
+    beforeEach(module('template/datepicker/popup.html'));
+    beforeEach(inject(function(_$compile_, _$rootScope_,_$httpBackend_) {
+        $compile = _$compile_;
+        $rootScope = _$rootScope_;
+        $httpBackend = _$httpBackend_;
+    }));
+
+    it("should send request to get customer template", function(){
+        var templateUrl = "test.html",
+            html = '<div><button type="button" ng-click="selectDate(\'2012-01-01\')">Next financial day</button></div>';
+        $httpBackend.whenGET(templateUrl).respond(200, html);
+        element = $compile('<datepicker-popup-wrap button-group-template-url="' + templateUrl + '"></datepicker-popup-wrap>')($rootScope);
+        $rootScope.$digest();
+        $httpBackend.flush();
+
+        expect(element.find('button').text()).toEqual("Next financial day");
+    });
+
 });
