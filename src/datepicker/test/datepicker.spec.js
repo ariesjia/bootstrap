@@ -1264,10 +1264,11 @@ describe('datepicker directive with empty initial state', function () {
   });
 });
 
-describe('',function(){
+describe('customise button group',function(){
     var $rootScope, element, $httpBackend;
 
     beforeEach(module('ui.bootstrap.datepicker'));
+    beforeEach(module('template/datepicker/datepicker.html'));
     beforeEach(module('template/datepicker/popup.html'));
     beforeEach(inject(function(_$compile_, _$rootScope_,_$httpBackend_) {
         $compile = _$compile_;
@@ -1276,8 +1277,9 @@ describe('',function(){
     }));
 
     it("should send request to get customer template", function(){
+        $rootScope.onCustomerButtonClick = function(){};
         var templateUrl = "test.html",
-            html = '<div><button type="button" ng-click="selectDate(\'2012-01-01\')">Next financial day</button></div>';
+            html = '<div><button type="button" ng-click="onCustomerButtonClick(\'next financial\')">Next financial day</button></div>';
         $httpBackend.whenGET(templateUrl).respond(200, html);
         element = $compile('<datepicker-popup-wrap button-group-template-url="' + templateUrl + '"></datepicker-popup-wrap>')($rootScope);
         $rootScope.$digest();
@@ -1285,5 +1287,21 @@ describe('',function(){
 
         expect(element.find('button').text()).toEqual("Next financial day");
     });
+
+    it("should send customer click event", function(){
+        $rootScope.onCustomerButtonClick = function(){};
+        spyOn($rootScope,"onCustomerButtonClick").andCallThrough();
+        var templateUrl = "test.html",
+            html = '<div><button class="customerBtn" type="button" ng-click="onCustomerButtonClick(\'next financial\')">Next financial day</button></div>';
+        $httpBackend.whenGET(templateUrl).respond(200, html);
+        element = $compile('<div><input type="text" datepicker-popup="" on-customer-button-click="onCustomerButtonClick($param);" ng-model="dt" button-group-template-url="' + templateUrl + '"/></div>')($rootScope);
+        $rootScope.$digest();
+        $httpBackend.flush();
+
+        element.find('.customerBtn').click();
+        $rootScope.$digest();
+        expect($rootScope.onCustomerButtonClick).toHaveBeenCalledWith(['next financial']);
+    });
+
 
 });

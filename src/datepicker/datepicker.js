@@ -296,6 +296,14 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
         scope.closeText = angular.isDefined(text) ? text : datepickerPopupConfig.closeText;
       });
 
+      if(attrs.onCustomerButtonClick){
+        var onCustomerButtonClick = $parse(attrs.onCustomerButtonClick);
+         scope.onCustomerButtonClick = function(){
+              var param = Array.prototype.slice.call(arguments, 0);
+              onCustomerButtonClick(originalScope, {$param: param});
+         };
+      }
+
       var getIsOpen, setIsOpen;
       if ( attrs.isOpen ) {
         getIsOpen = $parse(attrs.isOpen);
